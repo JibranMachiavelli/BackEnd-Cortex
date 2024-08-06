@@ -5,38 +5,97 @@ const port = 3000;
 const app = express();
 app.use(express.json());
 
-//routes
-app.get('/', async (req, res) => {
+// Healthcheck Route
+app.get('/health', async (req, res) => {
   try {
-    const data = await pool.query('SELECT * FROM login');
-    res.status(200).send(data.rows)
+      await pool.query('SELECT NOW()');
+      res.status(200).send({ message: "Service is up and running!" });
   } catch (err) {
-    console.log(err);
-    res.sendStatus(500);
+      console.error(err);
+      res.sendStatus(500);
   }
 });
 
-app.post('/', async (req, res) => {
-  const { name, location } = req.body;
+// Create Route
+app.post('/login', async (req, res) => {
+  const { role, name, password } = req.body;
   try {
-    await pool.query('INSERT INTO login (role, name, password) VALUES ($1, $2, $3)', [name, location]);
-    res.status(200).send({message: "Sucessfully added values"})
+      const result = await pool.query(
+          'INSERT INTO login (role, name, password) VALUES ($1, $2, $3) RETURNING *',
+          [role, name, password]
+      );
+      res.status(201).send(result.rows[0]);
   } catch (err) {
-    console.log(err);
-    res.sendStatus(500);
+      console.error(err);
+      res.sendStatus(500);
   }
 });
 
-app.get('./setup', async (req, res) => {
+// Read Route
+app.get('/login', async (req, res) => {
   try {
-    await pool.query(
-      'CREATE TABLE login( id serial4, role VARCHAR(50), name VARCHAR(100), password VARCHAR(255))'
-    );
-    res.status(200).send({message: "Sucessfully created table"})
+      const result = await pool.query('SELECT * FROM login');
+      res.status(200).send(result.rows);
   } catch (err) {
-    console.log(err);
-    res.sendStatus(500);
+      console.error(err);
+      res.sendStatus(500);
   }
 });
 
-app.listen(port, console.log(`Server has started on port: ${port}`));
+// Update Route
+app.put('/login/:id', async (req, res) => {
+  const { id } = req.params;
+  const { role, name, password } = req.body;
+  try {
+      const result = await pool.query(
+          'UPDATE login SET role = $1, name = $2, password = $3 WHERE id = $4 RETURNING *',
+          [role, name, password, id]
+      );
+      if (result.rowCount === 0) {
+          res.sendStatus(404); // Item not found
+      } else {
+          res.status(200).send(result.rows[0]);
+      }
+  } catch (err) {
+      console.error(err);
+      res.sendStatus(500);
+  }
+});
+
+// Delete Route
+app.delete('/login/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+      const result = await pool.query('DELETE FROM login WHERE id = $1 RETURNING *', [id]);
+      if (result.rowCount === 0) {
+          res.sendStatus(404); // Item not found
+      } else {
+          res.status(200).send({ message: "Item deleted successfully" });
+      }
+  } catch (err) {
+      console.error(err);
+      res.sendStatus(500);
+  }
+});
+
+// Initialize Table (run this once to create the table)
+app.get('/setup', async (req, res) => {
+  try {
+      await pool.query(
+          `CREATE TABLE IF NOT EXISTS login (
+              id SERIAL PRIMARY KEY,
+              role VARCHAR(50) NOT NULL,
+              name VARCHAR(100) NOT NULL,
+              password VARCHAR(255) NOT NULL
+          )`
+      );
+      res.status(200).send({ message: "Table created successfully" });
+  } catch (err) {
+      console.error(err);
+      res.sendStatus(500);
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});

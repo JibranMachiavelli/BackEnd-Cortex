@@ -1,15 +1,37 @@
-
+### Healthcheck Route
+GET http://localhost:13000/health
 ###
-GET http://localhost:13000/setup
 
-###
-GET http://localhost:13000
-
-###
-POST http://localhost:13000
+### Create Login Record
+POST http://localhost:13000/login
 Content-Type: application/json
 
 {
-    "name": "Jibran",
-    "location": "23 hello world street"
+  "role": "admin",
+  "name": "John Doe",
+  "password": "securepassword"
 }
+###
+
+### Read All Login Records
+GET http://localhost:13000/login
+###
+
+### Update Login Record
+PUT http://localhost:13000/login/1
+Content-Type: application/json
+
+{
+  "role": "user",
+  "name": "Jane Doe",
+  "password": "newsecurepassword"
+}
+###
+
+### Delete Login Record
+DELETE http://localhost:13000/login/1
+###
+
+### Setup Table
+GET http://localhost:13000/setup
+###
