@@ -6,7 +6,23 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: todos
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
   app:
-    image: back-cortex
+    build: .
     ports:
       - "13000:3000"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db-data:
