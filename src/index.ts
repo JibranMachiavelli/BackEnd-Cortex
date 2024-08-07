@@ -1,13 +1,15 @@
 import express, { Request, Response } from 'express';
 // eslint-disable-next-line import/no-unresolved
 import pool from './db';
+// eslint-disable-next-line import/no-unresolved
+import setupSwagger from './swagger';
 
 const port = 3000;
 const app = express();
+setupSwagger(app);
 
 app.use(express.json());
 
-// Healthcheck Route
 app.get('/health', async (req: Request, res: Response) => {
   try {
     await pool.query('SELECT NOW()');
@@ -18,7 +20,6 @@ app.get('/health', async (req: Request, res: Response) => {
   }
 });
 
-// Create Route
 app.post('/login', async (req: Request, res: Response) => {
   const { role, name, password } = req.body;
   try {
@@ -33,7 +34,6 @@ app.post('/login', async (req: Request, res: Response) => {
   }
 });
 
-// Read Route
 app.get('/login', async (req: Request, res: Response) => {
   try {
     const result = await pool.query('SELECT * FROM login');
@@ -44,7 +44,6 @@ app.get('/login', async (req: Request, res: Response) => {
   }
 });
 
-// Update Route
 app.put('/login/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   const { role, name, password } = req.body;
@@ -54,7 +53,7 @@ app.put('/login/:id', async (req: Request, res: Response) => {
       [role, name, password, id]
     );
     if (result.rowCount === 0) {
-      res.sendStatus(404); // Item not found
+      res.sendStatus(404);
     } else {
       res.status(200).send(result.rows[0]);
     }
@@ -64,7 +63,6 @@ app.put('/login/:id', async (req: Request, res: Response) => {
   }
 });
 
-// Delete Route
 app.delete('/login/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -73,7 +71,7 @@ app.delete('/login/:id', async (req: Request, res: Response) => {
       [id]
     );
     if (result.rowCount === 0) {
-      res.sendStatus(404); // Item not found
+      res.sendStatus(404);
     } else {
       res.status(200).send({ message: 'Item deleted successfully' });
     }
@@ -83,7 +81,6 @@ app.delete('/login/:id', async (req: Request, res: Response) => {
   }
 });
 
-// Initialize Table (run this once to create the table)
 app.get('/setup', async (req: Request, res: Response) => {
   try {
     await pool.query(`
@@ -92,7 +89,8 @@ app.get('/setup', async (req: Request, res: Response) => {
         role VARCHAR(50) NOT NULL,
         name VARCHAR(100) NOT NULL,
         password VARCHAR(255) NOT NULL
-      `);
+      )
+    `);
     res.status(200).send({ message: 'Table created successfully' });
   } catch (err) {
     console.error(err);

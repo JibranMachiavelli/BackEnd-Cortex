@@ -1,0 +1,11 @@
+-- Config and Comand's
+
+-- Swagger
+
+- http://localhost:13000/api-docs
+
+-- Docker
+
+- docker-compose up --build
+- docker compose down
+- docker compose up
