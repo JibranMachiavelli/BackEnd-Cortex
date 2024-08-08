@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 // eslint-disable-next-line import/no-unresolved
-import pool from './db';
+import pool from './config/db';
 // eslint-disable-next-line import/no-unresolved
 import setupSwagger from './swagger';
 
