@@ -14,7 +14,7 @@ services:
   app:
     build: .
     ports:
-      - "13000:3000"
+      - "3000:3000"
     depends_on:
       - db
     networks:
