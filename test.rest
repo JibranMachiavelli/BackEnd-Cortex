@@ -1,7 +1,4 @@
-### Healthcheck Route
-GET http://localhost:3000/health
-###
 
-###
-GET http://localhost:3000/api/health
+### Healthcheck Route
+GET http://localhost:3001/api/health
 ###

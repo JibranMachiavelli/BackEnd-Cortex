@@ -1,4 +1,4 @@
-import { IHealthCheckRepository } from './IHealthCheck.repository';
+import { IHealthCheckRepository } from './iHealthCheck Repository/IHealthCheck.repository';
 
 export class HealthCheckService {
   constructor(private repository: IHealthCheckRepository) {}

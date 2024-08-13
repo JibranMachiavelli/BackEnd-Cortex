@@ -1,6 +1,6 @@
 // src/features/healthCheck/healthCheck.repository.ts
 import pool from '../../config/db';
-import { IHealthCheckRepository } from './IHealthCheck.repository';
+import { IHealthCheckRepository } from './iHealthCheck Repository/IHealthCheck.repository';
 
 class HealthCheckRepository implements IHealthCheckRepository {
   async databaseHealth(): Promise<number | undefined> {
